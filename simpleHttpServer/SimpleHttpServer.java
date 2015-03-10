@@ -26,7 +26,8 @@ public class SimpleHttpServer {
 
          while (true) {
             Socket clientSocket = serverSocket.accept();
-            //SimpleHttpHandler connectionHandler = new SimpleHttpHandler(rootDirectory);
+            SimpleHttpHandler connectionHandler = new SimpleHttpHandler(rootDirectory);
+            connectionHandler.handle(clientSocket);
          }
       }
       catch (IOException e) {

@@ -7,9 +7,10 @@ import java.net.Socket;
 
 public class SimpleHttpHandler {
 
+   private String rootDirectory;
 
 	public SimpleHttpHandler(String rootDirectory) {
-		
+      this.rootDirectory = rootDirectory;	
 	}
 	
 	/**
@@ -39,18 +40,39 @@ public class SimpleHttpHandler {
 			
 			/* Hints (please remove after you read) */
 			// Read a string line from client
-			String line = in.readLine();
-			// Send a string to client
-			out.println("Not yet implemented");
-			// Send an empty line to client
-			out.println();
-			// Send a byte to client (used for sending non-text file)
-			out.write(123);
-			// Read a byte from file
-			file = this.requestFile(rootDirectory, relativePath);
-			FileInputStream fileInputStream = new FileInputStream(requestFile);
-			int b = fileInputStream.read(); // it returns -1 at end of file
-			/* End of Hints (please remove above) */
+			String initialLine = in.readLine();
+
+         String[] initialLineParts = initialLine.split(" ");
+
+         // Check whether we have a proper 3 part initial line and accept GET only
+         if(initialLineParts.length == 3 && initialLineParts[0].equals("GET")) {
+
+            // check for HTTP protocol
+            if (initialLineParts[2].contains("HTTP")) {
+               String relativePath = initialLineParts[1];
+               File file = this.requestFile(rootDirectory, relativePath);
+
+               // does the file exist?
+               if (file != null) {
+                  out.println("HTTP/1.0 200 OK");
+                  out.println();
+
+                  FileInputStream fileInputStream = new FileInputStream(file);
+
+                  int content;
+                  while ((content = fileInputStream.read()) != -1) {
+                     out.print((char) content);
+                  }
+               } else {
+                  out.print(this.error());
+               }
+            } else {
+               out.print(this.error());
+            }
+         } else {
+            out.print(this.error());
+         }
+      
 
 			// Close the remote socket and r/w objects
 			in.close();
@@ -61,7 +83,19 @@ public class SimpleHttpHandler {
 			e.printStackTrace();
 		}
 	}
+
 	
+   /**
+    * print error message to client, could be adjusted for different errors
+    */
+   public String error() {
+      String err = "HTTP/1.0 500 Internal Server Error\n";
+      err += "\n";
+      err += "^-^ Internal Server Error.";
+
+      return err;
+   }
+
 	/**
 	 * You can use this method without any modification.
 	 * Just put in rootDirectory and the relative path in request message.
