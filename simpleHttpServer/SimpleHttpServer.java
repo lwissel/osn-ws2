@@ -3,9 +3,13 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class SimpleHttpServer {
+
+   private String rootDirectory;
+   private int port;
 	
 	public SimpleHttpServer(String rootDirectory, int port) {
-		
+      this.rootDirectory = rootDirectory;
+      this.port = port;
 	}
 
 	/**
@@ -16,6 +20,18 @@ public class SimpleHttpServer {
 	 */
 	public void start() {
 		ServerSocket serverSocket;
+
+      try {
+         serverSocket = new ServerSocket(port);
+
+         while (true) {
+            Socket clientSocket = serverSocket.accept();
+            //SimpleHttpHandler connectionHandler = new SimpleHttpHandler(rootDirectory);
+         }
+      }
+      catch (IOException e) {
+         System.out.println("Listen: " + e.getMessage());
+      }
 	}
 	
 	/*
